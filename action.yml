@@ -31,7 +31,7 @@ runs:
     - name: Install gh CLI and Set Outputs
       shell: bash
       # The script will now handle setting outputs directly.
-      run: bash ${{ github.action_path }}/install.sh
+      run: ${{ github.action_path }}/install.sh
       env:
         INPUT_VERSION: ${{ inputs.version }}
         INPUT_TOKEN: ${{ inputs.token }}
