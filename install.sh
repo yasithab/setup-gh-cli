@@ -2,14 +2,12 @@
 set -e # Exit immediately if a command exits with a non-zero status.
 
 # 1. DETERMINE THE PLATFORM AND ARCHITECTURE
-EXE_SUFFIX=""
 if [[ "$RUNNER_OS" == "Linux" ]]; then
   PLATFORM="linux"
 elif [[ "$RUNNER_OS" == "macOS" ]]; then
   PLATFORM="macOS"
 elif [[ "$RUNNER_OS" == "Windows" ]]; then
   PLATFORM="windows"
-  EXE_SUFFIX=".exe" # Add .exe suffix for Windows
 else
   echo "Unsupported operating system: $RUNNER_OS"
   exit 1
@@ -58,11 +56,13 @@ else
 fi
 
 # 5. CONSTRUCT PATHS AND SET PERMISSIONS
+# REMOVED the fragile 'find' command.
+# Construct the path directly from variables we already know.
 GH_DIR="$INSTALL_DIR/gh_${GH_VERSION}_${PLATFORM}_${ARCH}"
 GH_BIN_DIR="$GH_DIR/bin"
-# Use the EXE_SUFFIX variable here
-GH_EXECUTABLE_PATH="$GH_BIN_DIR/gh${EXE_SUFFIX}"
+GH_EXECUTABLE_PATH="$GH_BIN_DIR/gh"
 
+# Crucial step: Ensure the binary is executable.
 echo "Setting execute permissions on $GH_EXECUTABLE_PATH"
 chmod +x "$GH_EXECUTABLE_PATH"
 
