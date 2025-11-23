@@ -1,0 +1,38 @@
+name: Test Action
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    name: Test on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Run local action
+        id: setup-gh
+        # The 'uses: ./' syntax tells the workflow to use the action
+        # from the current repository.
+        uses: ./
+        with:
+          version: '2.40.0' # Pin to a specific version for reliable testing
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Verify installation
+        run: |
+          echo "gh executable is at: ${{ steps.setup-gh.outputs.gh-path }}"
+          echo "Installed version: ${{ steps.setup-gh.outputs.version }}"
+          gh --version
+          gh auth status
+
+      - name: Test gh command
+        run: gh repo view ${{ github.repository }} --json name -q .name
