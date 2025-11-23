@@ -80,7 +80,8 @@ gh auth status
 
 # 8. SAVE OUTPUTS FOR THE NEXT STEP
 # Using temp files to pass values back to the main action.yml
-echo "$GH_EXECUTABLE_PATH" > "$HOME/gh_path.txt"
-echo "$GH_VERSION" > "$HOME/gh_version.txt"
+# Use printf to avoid adding a trailing newline, which breaks GITHUB_OUTPUT
+printf "%s" "$GH_EXECUTABLE_PATH" > "$HOME/gh_path.txt"
+printf "%s" "$GH_VERSION" > "$HOME/gh_version.txt"
 
 echo "✅ gh CLI setup complete."
