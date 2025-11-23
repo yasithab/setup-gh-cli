@@ -58,30 +58,34 @@ fi
 # Find the bin directory (path differs slightly by OS)
 GH_DIR=$(find "$INSTALL_DIR" -type d -name "gh_*")
 GH_BIN_DIR="$GH_DIR/bin"
-GH_EXECUTABLE_PATH="$GH_BIN_DIR/gh"
+GH_EXECUTABLE_PATH="$GH_DIR/gh"
 
 # 5. ADD TO PATH
-echo "Adding gh CLI to the system PATH..."
+echo "Adding newly installed gh CLI to the system PATH..."
 echo "$GH_BIN_DIR" >> "$GITHUB_PATH"
 
 # 6. AUTHENTICATE (if token is provided)
 if [[ -n "$INPUT_TOKEN" ]]; then
-  echo "Authenticating gh CLI..."
-  echo "$INPUT_TOKEN" | gh auth login --with-token
+  echo "Authenticating the new gh CLI..."
+  # Use the full path to ensure we're authenticating the correct binary
+  echo "$INPUT_TOKEN" | "$GH_EXECUTABLE_PATH" auth login --with-token
   echo "Authentication successful."
 else
   echo "Skipping authentication as no token was provided."
 fi
 
 # 7. VERIFY INSTALLATION
-echo "Verifying installation..."
-gh --version
-gh auth status
+echo "Verifying the newly installed gh CLI..."
+# Use the full path to ensure we are running the version we just installed
+"$GH_EXECUTABLE_PATH" --version
+"$GH_EXECUTABLE_PATH" auth status
 
 # 8. SET THE ACTION OUTPUTS
-# This is the new, direct method.
+# Use a here-document for the most robust output method.
 echo "Setting action outputs..."
-echo "gh-path=$GH_EXECUTABLE_PATH" >> "$GITHUB_OUTPUT"
-echo "version=$GH_VERSION" >> "$GITHUB_OUTPUT"
+cat <<EOF >> "$GITHUB_OUTPUT"
+gh-path=${GH_EXECUTABLE_PATH}
+version=${GH_VERSION}
+EOF
 
 echo "✅ gh CLI setup complete."
