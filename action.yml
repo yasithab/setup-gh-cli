@@ -1,6 +1,6 @@
 name: 'Setup gh CLI'
-description: 'Downloads, installs, and caches a specific version of the GitHub CLI (gh).'
-author: 'Yasitha Bogamuwa'
+description: 'Downloads, installs, and authenticates a specific version of the GitHub CLI (gh).'
+author: 'Your Name or Org'
 
 branding:
   icon: 'terminal'
@@ -8,7 +8,7 @@ branding:
 
 inputs:
   version:
-    description: 'The version of gh CLI to install (e.g., "2.4.0", "latest").'
+    description: 'The version of gh CLI to install (e.g., "2.40.0", "latest").'
     required: false
     default: 'latest'
   token:
@@ -28,28 +28,10 @@ outputs:
 runs:
   using: 'composite'
   steps:
-    - name: Install gh CLI
-      id: install
+    - name: Install gh CLI and Set Outputs
       shell: bash
-      run: |
-        # Pass inputs as environment variables to the script
-        # This is the standard way for composite actions
-        echo "::group::Install gh CLI"
-        bash ${{ github.action_path }}/install.sh
-        echo "::endgroup::"
+      # The script will now handle setting outputs directly.
+      run: bash ${{ github.action_path }}/install.sh
       env:
         INPUT_VERSION: ${{ inputs.version }}
         INPUT_TOKEN: ${{ inputs.token }}
-
-    # Set the outputs from the values produced by the script
-    - name: Set Outputs
-      shell: bash
-      id: set-outputs
-      run: |
-        echo "gh-path=$(cat $HOME/gh_path.txt)" >> $GITHUB_OUTPUT
-        echo "version=$(cat $HOME/gh_version.txt)" >> $GITHUB_OUTPUT
-
-    # Clean up temporary files
-    - name: Cleanup
-      shell: bash
-      run: rm -f $HOME/gh_path.txt $HOME/gh_version.txt
